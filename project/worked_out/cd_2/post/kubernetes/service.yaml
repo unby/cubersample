@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: post
+spec:
+  type: ClusterIP
+  selector:
+    app: reddit
+    component: post
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000

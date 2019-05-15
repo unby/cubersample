@@ -1,0 +1,17 @@
+before_script:
+ - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin $REGISTRY_URL
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - docker build -t gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA ./
+    - docker push gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA
+
+test:
+  stage: test
+  script:
+    - docker run --rm -t gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA sh ./very_hard_test.sh

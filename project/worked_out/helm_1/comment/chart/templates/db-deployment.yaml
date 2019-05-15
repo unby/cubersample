@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.db.name }}
+  labels:
+    {{- range $key, $value := .Values.db.labels }}
+      {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.db.replicasCount }}
+  selector:
+    matchLabels:
+      {{- range $key, $value := .Values.db.labels }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+  template:
+    metadata:
+      name: {{ .Values.db.name }}
+      labels:
+        {{- range $key, $value := .Values.db.labels }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Values.db.name }}
+          image: {{ .Values.db.image.repository}}:{{ .Values.db.image.tag }}

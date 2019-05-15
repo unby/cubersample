@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ui
+spec:
+  type: LoadBalancer
+  selector:
+    app: reddit
+    component: ui
+  ports:
+  - protocol: TCP
+    port: 9292
+    targetPort: 9292

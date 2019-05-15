@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: post-db
+spec:
+  type: ClusterIP
+  selector:
+    app: reddit
+    component: post-db
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017

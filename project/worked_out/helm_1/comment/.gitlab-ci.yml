@@ -1,0 +1,37 @@
+before_script:
+ - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin $REGISTRY_URL
+
+stages:
+  - build
+  - test
+  - release
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA ./
+    - docker push gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA
+
+test:
+  stage: test
+  script:
+    - docker run --rm -t gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA sh ./very_hard_test.sh
+
+release:
+  stage: release
+  script:
+    - docker pull gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA
+    - docker tag gcr.io/docker20/user<ваш номер>-comment:$CI_COMMIT_SHORT_SHA gcr.io/docker20/user<ваш номер>-comment:latest
+    - docker push gcr.io/docker20/user<ваш номер>-comment:latest
+
+deploy:
+  stage: deploy
+  script:
+    - apk add -U openssl curl tar gzip bash ca-certificates git
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+    - mkdir -p ~/.kube/ && echo $KUBE_CONFIG | base64 -d > ~/.kube/config
+    - kubectl cluster-info
+    - curl -L https://git.io/get_helm.sh | bash
+    - helm upgrade comment --wait -i --force --set image.tag=$CI_COMMIT_SHORT_SHA chart/

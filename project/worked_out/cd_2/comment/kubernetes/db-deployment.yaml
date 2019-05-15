@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comment-db
+  labels:
+    app: reddit
+    component: comment-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reddit
+      component: comment-db
+  template:
+    metadata:
+      name: comment
+      labels:
+        app: reddit
+        component: comment-db
+    spec:
+      containers:
+        - name: comment-db
+          image: mongo:3.2
